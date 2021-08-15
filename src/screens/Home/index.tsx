@@ -11,6 +11,7 @@ import {
   EmptyListContainer,
   EmptyListMessage
 } from './styles';
+import { string } from 'yup/lib/locale';
 
 interface LoginDataProps {
   id: string;
@@ -22,12 +23,23 @@ interface LoginDataProps {
 type LoginListDataProps = LoginDataProps[];
 
 export function Home() {
-  // const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
-  // const [data, setData] = useState<LoginListDataProps>([]);
+  const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
+  const [data, setData] = useState<LoginListDataProps>([]);
 
   async function loadData() {
-    // Get asyncStorage data, use setSearchListData and setData
+    const dataKey = '@passmanager:logins';
+    
+    const response = await AsyncStorage.getItem(dataKey);
+
+    if(response){
+      const responseFormatted = JSON.parse(response);
+
+      setData(responseFormatted);
+      setSearchListData(responseFormatted);
+    }
+    
   }
+
   useEffect(() => {
     loadData();
   }, []);
@@ -37,7 +49,9 @@ export function Home() {
   }, []));
 
   function handleFilterLoginData(search: string) {
-    // Filter results inside data, save with setSearchListData
+    const filteredData = data.filter((login: LoginDataProps) => (login.title.toUpperCase()).indexOf(search.toUpperCase()) >= 0);
+
+    setSearchListData(filteredData);
   }
 
   return (
